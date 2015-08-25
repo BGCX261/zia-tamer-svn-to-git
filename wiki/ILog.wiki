@@ -1,0 +1,34 @@
+#summary zia::api::ILog
+
+
+
+= Utilisation =
+
+{{{
+
+// api::ILog log;
+
+log << api::LOG_DEBUG << " debug toto my log" << std::endl;
+log << api::LOG_DEBUG << " debug toto my log" << std::endl;
+
+log.print(api::LOG_WARNING, "oups %s %d", "toto", 42);
+
+log << api::LOG_WARN;
+log << "begin of the sentence and ";
+log << "the end of the sentence";
+log << std::endl;
+
+// log les donnees uniquement quand std::endl
+
+}}}
+
+[http://ziatamer.com/doxygen/html/namespacezia_1_1api.html Liste de tout les api::LOG_]
+
+= Dans un module =
+
+Vous pouvez recuperer l'objet de log grace a la methode `log()` de la classe IMessage.
+
+
+<br/>
+
+== [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_log.html Doxygen ILog] ==

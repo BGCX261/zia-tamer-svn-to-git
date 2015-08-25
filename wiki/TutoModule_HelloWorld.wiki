@@ -1,0 +1,106 @@
+#summary Module Tuto: Hello World
+
+= Hello World =
+
+Commencer par `extern "C" ...` pour mieux comprendre.
+
+module d'exemple.
+
+{{{
+
+#include "api/init.hpp"
+
+using namespace zia;
+
+//
+// Mon super HelloWorld module:
+//
+class HelloWorld : public api::IModule
+{
+public:
+    HelloWorld() { }
+    virtual ~HelloWorld() { }
+
+    void        module_delete(api::IConnection&)
+    {
+        delete this;
+    }
+
+    //
+    // Ma methode pour le HttpStep::Callback sur l'etape `EXEC`
+    //
+    api::AStream*       stepExec(api::IMessage& message, api::AStream* input)
+    {
+
+        // je cre un stream de sortie et je le garde dans `mOut`
+        mOut = message.newDataStream();
+
+        // je set le reader du stream pour le traitement des donnees
+        input->setReader(
+            api::AStream::Reader::create<HelloWorld, &HelloWorld::readerExec>(this)
+        );
+
+        // set le closeReader pour propager le close
+        input->setCloseReader(
+            api::AStream::Reader::create<HelloWorld, &HelloWorld::close>(this)
+        );
+
+        // je retourne le stream de sortie
+        return (mOut);
+    }
+
+    //
+    // Mon reader pour `EXEC`
+    //
+    int                 readerExec(api::AStream& input)
+    {
+        input.drop();
+        // ecrir "Hello World"
+        mOut->write("<p> Hello World !! </p>");
+
+        // Comme j'ai finis, je drop tout le reste des donnees de la requete
+        input.close();
+
+        return (api::ZIA_OK);
+    }
+
+    //
+    // Mon closeReader pour propager correctement le close
+    //
+    int                 close(api::AStream&)
+    {
+        mOut->close();
+        return (api::ZIA_OK);
+    }
+
+private:
+    api::AStream*       mOut;
+
+};
+
+extern "C"
+{
+
+    zia::api::IModule*  module_new(std::list<zia::api::HttpStep::Pair>& stepsCallbacks,
+                                   zia::api::IConnection& connection,
+                                   zia::api::IConf& conf)
+    {
+        HelloWorld*      hello = new HelloWorld();
+
+        // je remplis la liste de HttpStep::Pair
+        stepsCallbacks.push_back(
+            api::HttpStep::Pair(api::STEP_EXEC,
+                                api::HttpStep::Callback::create<HelloWorld, &HelloWorld::stepExec>(hello)
+            )
+        );
+        // cad: je veux que `HelloWorld::stepExec` soit appeler a l'etape `EXEC`
+
+        // je retourne mon IModule
+        return (hello);
+    }
+
+}
+
+
+
+}}}

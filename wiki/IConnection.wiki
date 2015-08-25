@@ -1,0 +1,36 @@
+#summary zia::api::IConnection
+
+= IConnection =
+
+Permet de representer la connection.
+
+= Methodes =
+
+  == info ==
+
+Retourne le DataTree des informations sur la connection:
+
+Valeur predefinis pour l'api:
+
+|| *Cle* || *Valeur* ||
+|| `connection port` || Port ||
+|| `connection ip` || IP ||
+
+|| *Cle* || *Liste* ||
+
+
+  == setFdReadCallback ==
+
+Permet d'abstraire la lecture dans le FD (la ressource) correspondant a cette connection.
+
+
+
+  == setFdWriteCallback ==
+
+Pariel que setFdReadCallback, mais pour l'ecriture.
+
+
+
+<br />
+
+== [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_connection.html Doxygen IConnection] ==

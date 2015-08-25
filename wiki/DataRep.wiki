@@ -1,0 +1,53 @@
+#summary zia::api::DataRep
+
+
+
+= Representation de donnees =
+
+Cet objet permet de representer la majorite des donnees necessaire dans un serveur http: header http, configuration ou diverses informations etc...
+
+Apres avoir analyser les differentes formes de donnees, une simple reprentation "cles" > "valeurs" et "cles" > "list de valeurs" suffit amplement.
+
+
+
+= Les cles =
+
+Les cles sont des chaines de characteres et les differents niveau de variables et de sous variables sont donc representes par des points :
+
+{{{
+
+"my_var.my_sub_var.my_value" : "super value"
+"my_var.my_sub_var.my_list" : [ "A", "B", "C" ]
+
+}}}
+
+
+
+= Code =
+
+L'objet DataRep contient donc seulement un `map< string, string >` et un `map< string, list<string> >`
+
+Quelques examples d'utilisation:
+
+{{{
+
+DataRep data;
+
+// values :
+data.value("my_var.my_sub_var.my_value", "super value");
+std::cout << data.value("my_var.my_sub_var.my_value") << std::endl;
+
+// lists :
+data.list("my_var.my_sub_var.my_list").push_back("A");
+
+// recuperer une reference sur la list :
+std::map<std::string, std::list<std::string> > & list =
+    data.list("my_var.my_sub_var.my_list");
+list.push_back("B");
+list.push_back("C");
+
+}}}
+
+<br/>
+
+== [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_data_rep.html Doxygen DataRep] ==

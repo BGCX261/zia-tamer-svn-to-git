@@ -1,0 +1,26 @@
+#summary Dans le Core
+
+= Implementer notre API =
+
+Pour l'impletation dans le core du Zia, il suffit de [http://ziatamer.com/doxygen/html/ suivre le Doxygen] qui a ete concu pour implementer rapidement notre API.
+
+= Classes a implementer dans le Core =
+
+(non-virtuels)
+
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_data_tree.html DataTree]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_connection.html IConnection]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_log.html ILog]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_message.html IMessage]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_a_stream.html AStream]
+
+
+= Classes a heriter dans le Core =
+
+(interfaces)
+
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_conf.html IConf]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_connection.html IConnection]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_log.html ILog]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_message.html IMessage]
+  * [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_a_stream.html AStream]

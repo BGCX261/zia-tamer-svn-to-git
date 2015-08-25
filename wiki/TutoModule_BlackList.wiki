@@ -1,0 +1,103 @@
+#summary Module Tuto: BlackList
+
+= Petit module de black list =
+
+Conceptes utilisés:
+
+  * module global (une instance pendant toute la durée du serveur)
+  * module sans traitement de données (sans AStream)
+  * IMessage::info()
+  * IConf
+  * ILog
+
+{{{
+
+
+#include <algorithm>
+
+#include "api/init.hpp"
+
+using namespace zia;
+
+class BlackList : public api::IModule
+{
+public:
+    bool                        mEnabled;
+    std::list< std::string >    mList;
+
+    BlackList(zia::api::IConf& conf, zia::api::ILog& log)
+        : mEnabled(false)
+    {
+        if (conf.c()["server"]["modules"]["black_list"]["enable"] == "1")
+        {
+            mEnabled = true;
+            mList.push_back("66.66.66.66");
+            mList.push_back("88.88.88.88");
+            mList.push_back("99.99.99.99");
+            log << api::LOG_INFO << "BlackList enabled" << std::endl;
+        }
+        else
+            log << api::LOG_INFO << "BlackList disabled" << std::endl;
+    }
+
+    virtual ~BlackList() { }
+
+    void        module_delete(api::IConnection&)
+    {
+        // DO NOT DELETE : because BlackList need to be delete only where dll_unload.
+    }
+
+    api::AStream*               httpStepCallback(api::IMessage& message, api::AStream* input)
+    {
+        if (mEnabled)
+        {
+            std::list<std::string>::iterator it =
+                std::find(mList.begin(), mList.end(),
+                          message.connection().info().c()["connection"]["ip"].mValue);
+
+            if (it != mList.end())
+            {
+                message.log() << api::LOG_WARN << *it << ": DISCARD connection" << std::endl;
+                return (0);
+            }
+        }
+        return (input);
+    }
+
+};
+
+BlackList*              _blackList = 0;
+
+extern "C"
+{
+
+    void                dll_load(zia::api::IConf& conf,
+                                 zia::api::ILog& log)
+    {
+        _blackList = new BlackList(conf, log);
+    }
+
+    zia::api::IModule*  module_new(std::list<zia::api::HttpStep::Pair>& stepsCallbacks,
+                                   zia::api::IConnection& connection,
+                                   zia::api::IConf& conf)
+    {
+        if (_blackList->mEnabled == true)
+        {
+            stepsCallbacks.push_back(
+                api::HttpStep::Pair(api::STEP_IN_POST,
+                                    api::HttpStep::Callback::create<BlackList, &BlackList::httpStepCallback>(_blackList)
+                )
+            );
+        }
+        return (0);
+    }
+
+    void                dll_unload(zia::api::ILog& log)
+    {
+        delete _blackList;
+    }
+
+}
+
+
+}}}

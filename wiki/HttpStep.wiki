@@ -1,0 +1,56 @@
+#summary zia::api::HttpStep
+
+namespace HttpStep :
+
+= HttpStep::Callback =
+
+Un callback permetant de rappeler une methodes d'un objet.
+
+{{{
+
+//
+// Prototype de la methode a rappeler:
+//
+// AStream *        ( IMessage &, AStream * )
+//
+
+// Une classe: A
+// Une methode: AStream* A::toto( IMessage&, AStream* )
+
+// Creation d'un HttpStep::Callback :
+
+A  a;
+
+api::HttpStep::Callback    callback =
+    api::HttpStep::Callback::create<A, &A::toto>( &a );
+
+}}}
+
+
+
+= HttpStepID =
+
+Enum contenant toutes les etapes ou on peut enregistrer des HttpStep::Callback. [http://ziatamer.com/doxygen/html/namespacezia_1_1api.html Doxygen: Toutes les etapes]
+
+
+
+= HttpStep::Pair =
+
+Permet d'associer une etape et un HttpStep::Callback a rappeler :
+
+{{{
+
+A       a;
+std::list< zia::api::HttpStep::Pair > steps;
+
+steps.push_back(api::HttpStep::Pair(
+                    api::STEP_EXEC_POST,
+                    api::HttpStep::Callback::create<A, &A::toto>( &a )
+                ));
+
+//
+// Appeller (&a)->toto(...) quand on arrive a l'etape STEP_EXEC_POST
+//
+
+
+}}}

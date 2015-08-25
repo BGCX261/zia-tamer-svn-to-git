@@ -1,0 +1,7 @@
+#summary Troubleshooting
+
+
+
+= Elimination de probleme =
+
+  * * gcc error: Callback::create * : verifier bien le type de retour et les types des arguments de la callback. Ils doivent etre strictement egaux.

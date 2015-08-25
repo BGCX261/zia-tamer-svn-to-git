@@ -1,0 +1,98 @@
+#summary zia::api::Callback
+
+== Ce que vous devez savoir ==
+
+Les callbacks sont la base de l'api.
+
+A la manière des Delegates du framework .Net, les callbacks permettent d'imposer un prototypage strict sur la fonction rappelée tout en faisant une abstraction du type d'objet associé (ou non) au pointeur de méthode/fonction.
+
+Par leur implémentation, le surcoût est quasiment nul comparé à un pointeur de fonction/méthode, la plupart des compilateurs (msvc et gcc en première ligne) les optimise facilement.
+
+En ce sens, elles présentent un réél avantage par rapport à une interface qui impose un héritage virtuel qui peut s'avérer trop coûteux sur des tâches répétées. 
+
+Voilà pourquoi Tamer n'est pas une API comme les autres, elle ne base pas ses interfaces sur un modèle d'héritage standard, mais sur une architecture événementielle, qui de plus facilite l'asynchronicité.
+
+== Comment les utiliser ==
+
+Tout d'abord, définissons quelle sera la signature de notre callback.
+
+{{{
+typedef zia::api::Callback<int (int, std::string)> daCallback;
+}}}
+
+ici, nous définissons un type *daCallback* qui retourne un *int* et prend en paramètres un *int* et un *std::string*.
+
+Maintenant, définissons un objet *A* ayant une méthode *meth* qui répond à ce prototype:
+
+{{{
+struct A
+{
+   int    meth(int i, std::string s) {
+     std::cout << s << " veut verifier si " << i << "+42 vaut bien " << i + 42;
+     return (i + 42);
+   }
+};
+}}}
+
+C'est tout simple, mais celà suffira.
+
+Maintenant, instancions notre callback et assignons-lui une valeur:
+
+{{{
+{
+   A            a;
+   daCallback   dcb = daCallback::create<A, &A::meth>(&a);
+}
+}}}
+
+Nous avons instancié une instance de A, puis nous avons créé notre callback avec pour paramètre un pointeur sur l'instance *a* de *struct A:*. 
+
+Nous lui avons aussi indiqué en *paramètres template* à quelle classe se rapportait le pointeur sur l'instance que nous lui donnions, ainsi que le pointeur sur la méthode souhaitée.
+
+Ensuite, nous l'appelons avec les paramètre appropriés:
+
+{{{
+{
+    int    j = dcb(42, "Boubak");
+}
+}}}
+
+=== Et avec un pointeur sur fonction ? ===
+
+La politique de l'api sur les pointeurs de fonctions est un peu moins straightforward. Elle permet de transmettre *une donnée de callback* à la fonction pour que cette dernière reçoive le contexte associé à sa définition.
+
+Un code vaut mieux qu'un long discours:
+
+{{{
+int    function(void* data, int i, std::string s) {
+   IConf* conf = static_cast<IConf*>(data);
+
+   if (!conf || conf->canOutput())
+     std::cout << s << " veut verifier si " << i << "+42 vaut bien " << i + 42;
+   return (i + 42);
+}
+
+int   main()
+{
+    Conf        conf;
+    daCallback  dcb = daCallback::create(&function, &conf);
+
+    conf.canOutput(true);
+    dcb(42, "Tipiak");
+}
+
+}}}
+
+Nous voyons ici que la callback est construite en lui donnant en paramètre le pointeur sur la fonction rappelée, puis un pointeur sur notre *paramètre de callback*. La fonction rappelée _se doit_ dans tous les cas d'avoir en premier paramètre un pointeur void, qui peut être nul si vous décidez de ne pas fournir de deuxième paramètre.
+
+Ainsi, si je ne voulais pas transmettre à ma fonction de donnée de callback, j'aurais pu écrire:
+
+{{{
+{
+   daCallbacl   dcb = daCallback::create(&function);
+}
+}}}
+
+== Leur utilité dans l'API ==
+
+Les callbacks sont utilisées dans l'API par exemple au sein des HttpStep::Pair pour enregistrer un module au sein d'une étape HTTP, ou bien dans [AStream] pour mettre en place un reader une fois qu'un flux est reçu par un module à l'étape où il s'est enregistré.

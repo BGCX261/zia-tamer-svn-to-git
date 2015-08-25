@@ -1,0 +1,55 @@
+#summary Comment ca marche ?
+
+= Comment ca marche ? =
+
+== 2 parties distinctes : ==
+
+On a concu notre Api de maniere a avoir 2 parties distinctes dans l'execution d'une requete :
+
+  * D'un cote on a les etapes HTTP (!HttpStep), qui sont juste des etapes dans l'execution d'une requete.
+
+  * De l'autre on fait le traitement des donnees de la requete grace aux AStream.
+
+
+
+  === Etapes HTTP : !HttpStep ===
+
+Les etapes http ne sont donc que des moments cles unique dans l'execution d'une requete. Par exemple, quand on a fini de parser la requete, on arrive a l'etape `STEP_PARSER_POST`.
+
+Les modules vont pouvoir demander a etre appelés a ces moments cles. Pour ca, les modules vont remplir une liste qui contient les associations entre les etapes et les callbacks a rappeler:
+
+{{{
+
+//
+// Simplification de HttpStep :
+//
+
+HttpStepID               //: enum des etapes
+HttpStep::Callback       //: le type callback pour les HttpStep
+
+class HttpStep::Pair
+{
+    HttpStepID           etape;
+    HttpStep::Callback   callback;
+};
+
+//
+// liste d'association:
+//
+std::list< HttpStep::Pair >
+
+}}}
+
+Toutes les etapes sont decrites plus tard dans la doc et dans le Doxygen.
+
+
+
+  === Donnees : AStream ===
+
+Grace au !HttpStep::Callback qui sont appeles aux bons moments, les modules vont pouvoir creer des AStream pour traiter les donnees brutes de la requete... je m'explique:
+
+Quand un !HttpStep::Callback est execute, il recoit un AStream d'entree qui va contenir les donnees de la requete. Si le module a besoin de modifier/recuperer ces donnees, il va demander au AStream de le rappeler quand les donnees arriveront.
+
+Le module demande a etre rappele en donnant au AStream concerne un AStream::Reader qui est un callback sur n'importe quelle methode. Le module va donc pouvoir faire ses traitements dans ce Reader au bon endroit dans l'execution  de la requete.
+
+Maintenant qu'on a l'entree, il faut la sortie pour renvoyer les nouvelles donnees traitees: dans le !HttpStep::Callback, le module va donc creer un nouveau AStream pour ecrire dedans, et le retourner pour dire au Core que les nouvelles donnees de la requete seront dans ce AStream.

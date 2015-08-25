@@ -1,0 +1,6 @@
+#summary Foire aux questions
+#sidebar TableOfContents
+
+= FAQ =
+
+Posez nous des questions interressantes, on se fera un plaisir d'y repondre ici...

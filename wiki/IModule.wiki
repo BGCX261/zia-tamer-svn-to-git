@@ -1,0 +1,11 @@
+#summary zia::api::IModule
+
+[http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_module.html >> Doxygen IModule]
+
+= Everything you want =
+
+Comme notre api se base sur un systeme de callback super performant, vous pouvez implementer toutes les methodes que vous voulez, pour ensuite les enregisterer soit comme HttpStep::Callback, soit comme AStream::Reader.
+
+<br />
+
+== [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_module.html Doxygen IModule] ==

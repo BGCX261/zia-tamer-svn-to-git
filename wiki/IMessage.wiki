@@ -1,0 +1,87 @@
+#summary zia::api::IMessage
+
+
+
+= Introduction =
+
+IMessage est l'objet qui va vous permettre de gerer tout votre message:
+
+  * Il contient les informations sur la requetes
+  * Il contient le header http de la requete
+  * Il fait le lien entre la requete et le Core pendant l'execution
+
+
+
+= Methodes =
+
+  == isParsed ==
+
+Quand le header http est considere comme completement parse, `isParsed() == true`.
+
+
+  == http ==
+
+Retourne un DataTree qui contient les champs HTTP de la requete.
+
+Sauf explicitement specifie ci-dessous, les cles correspondent aux champs HTTP en minuscules.
+
+
+
+  == httpResp ==
+
+Retourne une reference sur le DataTree des champs HTTP de la reponse.
+
+
+
+  == newDataStream ==
+
+Retourne un pointeur sur un nouveau stream alloue utilisable par le module.
+
+
+
+  == newMessageAtStep ==  
+
+Cette methode va permettre de creer un message gerer en parallele du message courant: tres util pour les 1XX.
+
+Ce nouveau message est connecte sur la meme IConnection, va demerarer a l'etape `stepId`, et va recevoir le stream `input` comme entree.
+
+
+
+  == newResourceStream ==
+
+Retourne un nouveau stream qui va recevoir les donnee directement du `FD` passe en parametre (permet la gestion asynchrone des FD).
+
+
+= Header Http Predefinis =
+
+IMessage::http()
+
+|| *Cle* || *Valeur* ||
+|| `version` ||  ||
+|| `method` ||  ||
+|| `uri` ||  ||
+|| `code` ||  ||
+|| `reason` ||  ||
+|| `http connection` ||  ||
+|| `http content-length` ||  ||
+|| `http accept` ||  ||
+|| `http accept-charset` ||  ||
+|| `http host` ||  ||
+|| `http referer` ||  ||
+|| `http content-type` ||  ||
+|| `http content-encoding` ||  ||
+|| `http www-authenticate` ||  ||
+||  ||  ||
+
+>> etc etc ... <<
+
+|| *Cle* || *Liste* ||
+|| `http user-agent`  ||  ||
+|| `http cache-control` ||  ||
+
+>> etc etc ... <<
+
+
+<br/>
+
+== [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_message.html Doxygen IMessage] ==

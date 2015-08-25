@@ -1,0 +1,161 @@
+#summary Module Tuto: Chiffrement
+
+= Module de chiffrement =
+
+Conceptes utilisés:
+
+  * abstraction lecture/exriture FD
+  * log
+  * 1 Module globale
+  * + 1 Module par connection
+
+{{{
+
+
+#include <unistd.h>
+
+#include "api/init.hpp"
+
+#define BUFF_SIZE               (4095)
+
+using namespace zia;
+
+//
+// SingleTon pour charger les certifs et titous...
+//
+class ChiffreSingle
+{
+public:
+
+    static ChiffreSingle&       i()
+    {
+        if (mI == 0)
+            mI = new ChiffreSingle();
+        return (*mI);
+    }
+
+    static void                 end()
+    {
+        // dechargement du chiffrement
+        if (mI == 0)
+            delete mI;
+        mI = 0;
+    }
+
+private:
+    static ChiffreSingle*       mI;
+
+    ChiffreSingle()
+    {
+        // chargement du chiffrement
+    }
+
+    ~ChiffreSingle()
+    {
+        end();
+    }
+
+};
+
+ChiffreSingle*                  ChiffreSingle::mI = 0;
+
+//
+// Objet pour garder le contexte de chaques connections...
+//
+class Chiffre : public api::IModule
+{
+public:
+    static Chiffre*     init(zia::api::IConnection& connection,
+                             zia::api::IConf& conf)
+    {
+        if (connection.info().c()["connection"]["port"] != "443")
+            return (0);
+        connection.log() << api::LOG_INFO << "Chiffrement enabled";
+        return (new Chiffre());
+    }
+
+    Chiffre()
+    {
+        // chargement contexte
+        mCtx = new int(42);
+    }
+
+    virtual ~Chiffre()
+    {
+        // dechargement contexte
+        if (mCtx != 0)
+            delete mCtx;
+    }
+
+    void        module_delete(api::IConnection&)
+    {
+        delete this;
+    }
+
+    api::AStream*       stepIn(api::IMessage& message, api::AStream* input)
+    {
+        // if error
+        if (mCtx == 0)
+        {
+            message.log() << api::LOG_WARN << "Chiffrement fail" << std::endl;
+            // close connection:
+            return (0);
+        }
+        return (input);
+    }
+
+    // read from FD, write on the stream
+    ssize_t             read(int fd, void* data, size_t s)
+    {
+        return (::read(fd, data, s));
+    }
+
+    // read from the stream, write on the FD
+    ssize_t             write(int fd, void* data, size_t s)
+    {
+        return (::write(fd, data, s));
+    }
+
+private:
+    int*                mCtx;
+
+};
+
+extern "C"
+{
+
+    void                dll_load(zia::api::IConf& conf,
+                                 zia::api::ILog& log)
+    {
+        ChiffreSingle::i();
+    }
+
+    zia::api::IModule*  module_new(std::list<zia::api::HttpStep::Pair>& steps,
+                                   zia::api::IConnection& connection,
+                                   zia::api::IConf& conf)
+    {
+        Chiffre*        chiffre;
+
+        if ((chiffre = Chiffre::init(connection, conf)) == 0)
+            return (0);
+
+        // Set override of read and write for this connection.
+        connection.setFdReadCallback(api::FdCallback::create<Chiffre, &Chiffre::read>(chiffre));
+        connection.setFdWriteCallback(api::FdCallback::create<Chiffre, &Chiffre::write>(chiffre));
+
+        steps.push_back(api::HttpStep::Pair(
+                            api::STEP_IN,
+                            api::HttpStep::Callback::create<Chiffre, &Chiffre::stepIn>(chiffre)
+                        ));
+        return (chiffre);
+    }
+
+    void                dll_unload(zia::api::ILog& log)
+    {
+        ChiffreSingle::end();
+    }
+
+}
+
+
+}}}

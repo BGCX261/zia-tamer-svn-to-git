@@ -1,0 +1,22 @@
+#summary Presentation de l'api
+
+
+
+= Presentation =
+
+Notre api a ete concu dans le but d'avoir une implementation plutot rapide mais surtout tres libre tout en grattant un maximum de performance.
+
+Certains pourraient critiquer en disant que nous avons perdu un peu en simplicite de comprehension: certes notre conception est differente des apis "UML-compliant", mais le petit effort d'esprit a fournir en vaut vraiment la peine.
+
+
+
+
+= Comment se documenter ? =
+
+  * Commencez par les [Videos]
+
+  * *Venez a notre conference*
+
+  * Essayez de lire le Wiki dans l'ordre
+
+  * Servez vous du Doxygen quand vous serez plus a l'aise.

@@ -1,0 +1,46 @@
+#summary zia::api::DataTree
+
+= DataTree =
+
+L'objet DataTree contient 3 choses:
+
+  * `mValue` : `string` : une valeur propre.
+  * `mList` : `list<string>` : une liste de valeur.
+  * `mSubs` : `map<string,DataTree>` : plein de sous DataTree.
+
+= Usage =
+
+{{{
+
+//
+// contexte normale :
+//
+
+DataTree tree;
+
+tree["toto"]["titit"] = "une valeur";
+tree["toto"]["titit"].mValue = "pareil";
+tree["toto"].mSubs["titit"] = "encore pareil";
+
+tree["toto"]["titit"].mList.push_back("un element de la list");
+
+if ( tree["toto"]["titit"] == "encore pareil" ) // == teste mValue
+    return true; // vrai
+
+//
+// dans un contexte constant :
+//
+
+// c() => force le contexte constant
+
+string s = tree.c()["toto"]["titi"];
+string s = tree.get("toto").get("titi").v(); // pareil
+
+// acces sur une branche inexistante renvoi un DataTree vide:
+
+if ( tree.c()["asddasasd"] == ""
+     && tree.c()["asddasasd"] == tree.c()["asddasasd"]["assdasd"] )
+    return (true); // toujours vrai
+
+
+}}}

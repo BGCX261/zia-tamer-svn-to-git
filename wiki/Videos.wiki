@@ -1,0 +1,14 @@
+#summary Les videos de Tamer
+#sidebar TableOfContents
+
+= Presentation generale =
+
+Presentation generale de l'api:
+
+<wiki:video url="http://www.youtube.com/watch?v=Rqu_UJiOrfI"/>
+
+
+
+= Presentation technique =
+
+<wiki:video url="http://www.youtube.com/watch?v=-PpttXf5KUM"/>

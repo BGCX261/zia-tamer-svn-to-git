@@ -1,0 +1,62 @@
+#summary Dans Les Modules
+
+
+
+= Bibliotheques et Configuration =
+
+Nous vous conseillons de gerer vos modules dans une liste de nom de module: pour un module nomme "supertoto", vous irez cherchez le fichier "libsupertoto.so" ou "supertoto.dll".
+
+Ca va permettre de simplifier le passage de configuration du module dans [IConf] : "`server.module.supertoto.*`"
+
+
+
+= IModule =
+
+Vous pouvez heriter de IModule, ou pas, de ce cote l'api est tres flexible. Ca va dependre surtout du but de votre module.
+
+
+
+= Fonctions externes =
+
+Les fonctions externes pour votre modules se trouve dans *init.hpp*
+
+
+
+  == dll_load ==
+
+{{{
+void                dll_load(zia::api::IConf& conf,
+                             zia::api::ILog& log);
+}}}
+
+Chargement de la DLL.
+
+Typiquement, permet d'initialiser des variables/classes globales.
+
+
+
+  == dll_unload ==
+
+{{{
+void                dll_unload(zia::api::ILog& log);
+}}}
+
+Dechargement de la DLL.
+
+Permet de detruire ce que vous avez construit au chargement de la DLL.
+
+
+
+  == module_new ==
+
+{{{
+zia::api::IModule*  module_new(std::list<zia::api::HttpStep::Pair>& stepsCallbacks,
+                               zia::api::IConnection& connection,
+                               zia::api::IConf& conf);
+}}}
+
+Nouvelle connection.
+
+Permet de:
+  * Allouer votre module (si besoin est)
+  * Ajouter vos Callback aux HttpStep (grace a `stepsCallbacks`)

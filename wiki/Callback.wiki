@@ -1,0 +1,81 @@
+#summary This is Tamer !!
+
+= Avertissement  =
+
+Avis au ames sensible, cette section peut mordre.
+
+= Introduction =
+
+Qui est ne en premier ? Tamer avant Callback, Callback avant Tamer ?
+
+Tout ce que nous savaons aujourd'hui c'est que sans Callback, Tamer n'existerai pas, et sans Tamer, Callback n'aurait jamais vu le jour.
+
+Callback vient de la conjugaison de pointeurs sur methodes, de theories fumeuses sur les delegates en C++, et sans aucun doute de muses qui passaient par la.
+
+= Impossible fast delegates GLH =
+(GLH: Goes Like Hell)
+
+Nos Callback sont des objets non-virtuels, leger, et qui permettent de sauvegarder un pointeurs sur methodes d'une instance, pour le rapeller plus tard.
+
+Avantages:
+  * non-virtuel: rapide
+  * taille de 2 pointeurs: leger
+  * type retour et arguments strict (comme un pointeur sur fonction en C)
+  * N'importe quelle methode de nimporte quelle objet
+
+inconvenients:
+  * L'instance est nessecaire a la creation de la Callback.
+
+Dans le pire des cas, l'appel coute un pointeur sur fonction plus l'appel de la methode.
+
+Dans la majoritee des cas l'appelle du Callback coute uniquement un pointeur sur fonction.
+
+Dans tout les cas, on a donc un appel plus rapide qu'un appel virtuel.
+
+
+
+= Utilisation =
+
+
+Le plus pratique est de `typedef` la Callback pour l'utilisation:
+
+{{{
+
+//  prototype de la methode :
+//
+//  int     (double, long*)
+//
+
+typedef zia::api::Callback<int (double, long*)>  MyCallback;
+
+}}}
+
+Creation d'une MyCallback:
+
+{{{
+
+// example:
+// une classe A
+// avec une methode: int A::method(int, long*)
+// et
+// une classe B
+// avec une methode: int B::toto(int, long*)
+
+A a;
+B b;
+
+MyCallback c1 = MyCallback::create<A, &A::method>(&a);
+MyCallback c2 = MyCallback::create<B, &B::toto>(&b);
+
+}}}
+
+Et on l'appel a volontee:
+
+{{{
+
+long l;
+
+int res = c1(42, &l);
+c2(273, &l);
+
+}}}

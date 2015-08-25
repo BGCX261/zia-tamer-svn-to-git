@@ -1,0 +1,86 @@
+#summary zia::api::IStream
+
+
+
+L'objet IStream va vous permettre de faire le traitement des donnees.
+
+Les donnees d'entree sont ecritent dans le IStream, puis lues et traitees par le IStream::Reader.
+
+= IStream =
+
+Vous pouvez directement ecrire vos donnes dans le IStream grace a `write(...)`.
+
+La lecture dans le stream se fait de facon _asynchrone_: quand des donnees a lire sont disponible, le IStream appel sont IStream::Reader.
+
+= IStream::Reader =
+
+Le reader et l'element le plus important de IStream, et c'est grace a lui que notre api est si bien.
+
+Le reader est un callback sur une methode qui est appelee quand il y a quelque chose a lire dans le IStream.
+
+  == Utilisation/Creation d'un Reader: ==
+
+{{{
+// prototype de la methode d'un Reader:
+//
+// int            (IStream&)
+//
+
+// exemple:
+
+class Toto;
+int               Toto::tata(IStream& input);
+
+Toto              toto;
+IStream::Reader   reader =
+    IStream::Reader::create<Toto, &Toto::tata>( &toto );
+
+//
+// Pour seter le reader dans un `IStream& input` :
+//
+
+stream->setReader(
+    IStream::Reader::create<Toto, &Toto::tata>( &toto )
+);
+
+}}}
+
+
+
+= Methodes de IStream =
+
+
+  === Excpected size ===
+
+Vous pouvez demander au IStream d'appeler votre reader de preference quand il y au minimum une certaine taille a lire.
+
+Par exemple, si vous faite `setExpectedReadSize(512)`, le IStream essayera d'attendre 512 octets de donnees a lire avant d'appeler le reader.
+
+
+  === Close reader ===
+
+Le "close Reader" est un reader qui sera rappele a la fermeture du stream. Le IStream recu en parametre dans le reader sera donc ferme (`isClosed()` == `true`).
+
+
+
+  === Flush ===
+
+`flush()` va essayer de vider le stream en forcant l'appel du Reader. 
+
+
+
+  === Drop ===
+
+`drop()` va juste supprimer les donnees du stream sans appeler le reader.
+
+
+
+  === Drop All ===
+
+`dropAll()` permet de reset le Reader et de drop toutes les donnees qui arrive.
+
+Pour reativer le stream, il suffit de re-seter un reader (`setReader(...)`).
+
+<br />
+
+  === [http://ziatamer.com/doxygen/html/classzia_1_1api_1_1_i_stream.html  Doxygen IStream] ===
